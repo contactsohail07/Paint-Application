@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width:device-width,intial-scale:1">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+	.header{
+		display:block;
+		background-color:tomato;
+		padding:14px 25px;
+		text-align:center;
+		color:white;
+		font-family:times new roman;
+		font-size:20px;
+		font-style:oblique;
+	}
+
+	body{
+		background-color: #ffe5e5;
+	}
+
+	.row{
+		float:left;
+	}
+	#mycanvas{
+		border:3px solid black;
+		background-color:white;
+		margin:23px;
+	}
+	.row1{
+		float:right;
+	}
+	footer{
+	}
+
+</style>
+</head>
+<body>
+	<div class="header"><b>Tinger<b></div>
+	<div class="row">
+		<div id="tool">
+			<form>
+				<fieldset style="width:90px;border:3px solid tomato;margin:15px;height:180px;padding-top:4px">
+					<legend><u>T</u>ools</legend>
+					<h4 style="margin:25px"><button type="button" id="pencil" onclick="#"><i class="fa fa-pencil"></i></button></h4><br>
+					<p style="margin:2px;margin-left: 39px;"><i class="fa fa-eyedropper"></i></p><br>
+					<input type="color" id="fill" style="margin:2px;margin-left: 15px;margin-bottom: 15px;" ></input><br>
+				</fieldset>
+			</form>
+		</div>
+		<div id="ink">
+			<form>
+				<fieldset style="width:90px;border:3px solid tomato;margin:15px;height:auto;">
+					<legend><u>I</u>nks</legend>
+					<input type="color" id="mycolor" style="margin:15px;">
+				</fieldset>
+			</form>
+		</div>
+		<div id="new">
+			<form>
+				<fieldset style="width:93px;border:3px solid tomato;margin:15px;height:auto;">
+					<legend><u>N</u>ew</legend>
+					<h4 style="margin:23px">Page</h4>
+					<p style="margin:23px"><button type="button" id="newpage"><i class="fa fa-sticky-note-o"></i></button></p>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	<div class="row1">
+		<div id="reset">
+			<form>
+    			<fieldset style="width:90px;border:3px solid tomato;margin:15px;height:auto;padding-bottom: 2px ">
+    				<legend><u>G</u>raft</legend>
+    				<h4 style="margin:23px">Undo</h4>
+    				<p style="margin:26px"><button type="button" id="undo" onclick="#"><i class="fa fa-undo"></i></button></p>
+    			</fieldset>
+    		</form>
+    	</div>
+    	<div id="shape">
+    		<form>
+    			<fieldset style="width:94px;border:3px solid tomato;margin:15px;height:250px; ">
+    				<legend><u>E</u>mbody</legend>
+    				<h5><input type="radio" id="line" name="embody" checked="">Line</h5><br>
+    				<h5><input type="radio" id="rectangle" name="embody">Rect</h5><br>
+    				<h5><input type="radio" id="circle" name="embody">Circle</h5><br>
+    			</fieldset>
+    		</form>
+    	</div>
+    	<div id="range">
+    		<form>
+    			<fieldset style="width:94px;border:3px solid tomato;margin:15px;height:auto;">
+    				<legend><u>R</u>ange</legend>
+    				<select name="range" id="linewidth" style="margin: 10px ">
+    					<option value="1" id="t1" selected>1px</option>
+    					<option value="2" id="t2">2px</option>
+    					<option value="3" id="t3">3px</option>
+    					<option value="4" id="t4">4px</option>
+    					<option value="5" id="t5">5px</option>
+    					<option value="6" id="t6">6px</option>
+    					<option value="7" id="t7">7px</option>
+    					<option value="8" id="t8">8px</option>
+    					<option value="9" id="t9">9px</option>
+    					<option value="10" id="t10">10px</option>
+    				</select>
+    			</fieldset>
+    		</form>
+    	</div>
+    </div>	
+	<div>
+		<canvas id="mycanvas" width="920" height="500">
+		</canvas>
+    </div>
+    <script>
+    	var canvas=document.querySelector("canvas");
+		var context=canvas.getContext("2d")
+		var pencilit=document.getElementById("pencil")
+		var line=document.getElementById("line")
+		var circle=document.getElementById("circle")
+		var rect=document.getElementById("rectangle")
+		var color=document.getElementById("mycolor")
+		var width=document.getElementById("linewidth")
+		var clear=document.getElementById("newpage")
+		var fill=document.getElementById("fill")
+		var undo=document.getElementById("undo")
+		var tool,imgData,putData
+		var arr=[]
+		var x1,y1,x2,y2
+		var clicked
+		var co=canvas.getBoundingClientRect()
+
+
+		line.onclick=function(){
+			tool="line"
+		}
+		circle.onclick=function(){
+			tool="circle"
+		}
+		rect.onclick=function(){
+			tool="rectangle"
+		}
+		pencilit.onclick=function(){
+			tool="pencil"
+		}
+		clear.onclick=function(){
+			context.clearRect(0,0,920,500)
+		}
+		undo.onclick=function(){
+			putData=arr.pop()
+        	context.putImageData(putData,0,0)
+        }
+
+
+
+		function drawline(x_1,y_1,x_2,y_2){
+			context.strokeStyle=color.value
+			context.lineWidth=width.value
+			context.beginPath()
+			context.moveTo(x_1,y_1)
+			context.lineTo(x_2,y_2)
+			context.stroke()
+			context.closePath()
+		}
+
+		function drawcircle(x_1,y_1,x_2,y_2){
+			context.fillStyle=fill.value
+			context.strokeStyle=color.value
+			context.lineWidth=width.value
+			context.beginPath()
+			context.arc(x_1,y_1,x_2-x_1,0,2*Math.PI)
+			context.stroke()
+			context.fill()
+			context.closePath()
+		}
+
+		function drawrect(x_1,y_1,x_2,y_2){
+			context.fillStyle=fill.value
+			context.strokeStyle=color.value
+			context.lineWidth=width.value
+			context.beginPath()
+			context.rect(x_1,y_1,x_2-x_1,y_2-y_1)
+			context.stroke()
+			context.fill()
+			context.closePath()
+		}
+
+		function drawpencil(x_1,y_1,x_2,y_2){
+			context.strokeStyle=color.value
+			context.lineWidth=width.value
+			context.beginPath()
+			context.moveTo(x_1,y_1)
+			context.lineTo(x_2,y_2)
+			context.stroke()
+			context.closePath()
+		} 
+
+		canvas.onmousedown=function(e){
+			clicked=true
+			canvas.style.cursor="grab"
+			x1=e.clientX - co.left
+			y1=e.clientY - co.top
+		}		
+
+		canvas.onmousemove = function(e){
+			if (clicked && tool == "pencil"){
+				x2=e.clientX - co.left
+				y2=e.clientY - co.top
+				imgData=context.getImageData(0,0,920,500)
+				arr.push(imgData)
+				drawpencil(x1,y1,x2,y2)
+				x1=x2
+				y1=y2 
+			}
+		}
+
+		canvas.onmouseup=function(e){
+			clicked=false
+			canvas.style.cursor="default"
+			x2=e.clientX - co.left
+			y2=e.clientY - co.top
+			if (tool=="line"){
+				imgData=context.getImageData(0,0,920,500)
+				arr.push(imgData)	
+				drawline(x1,y1,x2,y2)
+				}
+			else if (tool=="circle"){
+				imgData=context.getImageData(0,0,920,500)
+				putData=context.putImageData(imgData,0,0)
+				arr.push(putData)
+				drawcircle(x1,y1,x2,y2)
+				}
+			else {
+				imgData=context.getImageData(0,0,920,500)
+				arr.push(imgData)
+				drawrect(x1,y1,x2,y2)
+				}
+			}
+
+		window.onload = function(){
+			color.value="black"
+			fill.value="#FFFFFF"
+			width.value="1"
+
+		}
+	
+	</script>
+    <footer>
+    	<h5><center>Tinger Version-1.0 &copy; Sohail | Developed using HTML, Javascript and CSS </center></h5>
+    </footer>			
+</body>
+</html>
